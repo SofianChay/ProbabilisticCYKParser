@@ -198,6 +198,6 @@ and coding skills particularly in dynamic programming.
 
 First you need to download the the [Polyglot embedding lexicon for French](https://sites.google.com/site/rmyeid/projects/polyglot). Then :
 ```
-run.py Les enfants fêtent Saint Honoré .
+python run.py --lines Les enfants fêtent Saint Honoré .
 ```
 will parse the sentence "Les enfants fêtent Saint Honoré.".
