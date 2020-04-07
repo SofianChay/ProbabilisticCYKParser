@@ -120,7 +120,7 @@ right element of the table and with the start symbol
 and at each step the left and right node. The stopping
 condition is when a node has no right and left element.
 
-#### Remove artificial symbols created because of the Chomsky Normal Form
+#### Removing artificial symbols created because of the Chomsky Normal Form
 
 Eventually, the sentence is
 parsed with the grammar in Chomsky Normal Form,
@@ -142,9 +142,62 @@ original form.
 
 ### Training/test sets and evaluation metric 
 
+The Sequoia Treebank contains 3099 parsed French sentences. 80% were used for training (extract CFG rules), 10% for test, and 10% for development purposes. To evaluate the parser, we used **part-of-speech accuracy**. 
+
 ### First results 
+
+The first observation is that some sentences in the
+test set are not actual sentences. For instance, there are
+one token sentences or sentences that don’t end with a
+period. On these examples the parser provides strange
+results. One solution that I have implemented is to add
+a period as a preprocessing step when it does not exist
+(or any other final punctuation). Here is an exemple :
+The original sentences with its parsing :
+```
+(SENT (NP (DET Les) (NC enfants)) (VN (V fêtent)) (NP (NC saint) (NPP Honoré))))
+```
+The output when the final period is not added : 
+```
+(SENT Les)
+```
+The output when the final period is added (in Chomsky Normal Form) :
+```
+(SENT (NP+NP (NP (DET+NC ((DET les) (NC enfants)) (V fêtent)) NP ((NPP saint) (NPP honoré))) (PONCT .))) 
+```
+Eventually, on my first attempt, I have obtained a **61.8%** POS accuracy.
 
 ### Proper nouns handling and new results 
 
+I have noticed that sentences that contains proper nouns are often wrongly parsed. It is due to the fact that the proper nouns are not in the original vocabulary so the OOV module considered them as spelling mistakes. Thus, the wrong POS tag were assigned. To fix this issue I used the fact that proper nouns first letter are capital letters, so that when a word in a sentence to parse begins with a capital letter, I assign a probability greater than 0 (0.001 chosen arbitrarily) that this word is an actual proper noun. 
+Here is an example of output with and without this trick : 
+Ground truth :
+```
+(SENT (NP (DET Le) (ADJ 12) (NC février) (NC 1953)) (PONCT ,) (NP (DET l') (NPP OIC)) (VN (V imposa)) (PP (P+D aux) (NP (NC banques))) (NP (DET le) (NC recours) (PP (P+D au) (NP (NC crédit) (AP (ADJ documentaire))))) (PP (P pour) (NP (DET le) (NC règlement) (PP (P+D des) (NP (NC importations) (VPpart (VN (VPR provenant)) (PP (P de) (NP (DET l') (NPP Union) (AP (ADJ française))))))))) (PONCT .)))
+```
+Output without the proper noun trick :
+```
+((SENT le))
+```
+Output with the proper noun trick :
+```
+((SENT (NP (NPP Le) (NP (NC 12) (NC février)) (NP (NC 1953) (PONCT ,) (NP (ET l') (NPP OIC))) (V imposa)) (PP (P+D aux) (NP (NC banques) (DET le) (NC recours) (PP (P+D au) (NP (NC crédit) (NC documentaire)))) (P pour) (NP (DET le) (NC règlement) (PP (P+D des) (NP (NC importations) (VPR provenant) (P de) (NP (NPP l') (NC Union))))) (ADJ française)) (PONCT .)))
+```
+Thanks to this modification, we get a **67.2%** POS accuracy. 
+
 ## CONCLUSION
 
+Eventually, I have been able to build a functional
+probabilistic parser for French almost completely from
+scratch (PCFG extraction, tokenization, ...). Although
+this assignment was very ambitious, it was a great
+opportunity to discover parsing and to improve my NLP
+and coding skills particularly in dynamic programming.
+
+## RUN THE CODE 
+
+First you need to download the the [Polyglot embedding lexicon for French](https://sites.google.com/site/rmyeid/projects/polyglot). Then :
+```
+run.py Les enfants fêtent Saint Honoré .
+```
+will parse the sentence "Les enfants fêtent Saint Honoré.
