@@ -200,4 +200,4 @@ First you need to download the the [Polyglot embedding lexicon for French](https
 ```
 python run.py --lines Les enfants fêtent Saint Honoré .
 ```
-will parse the sentence "Les enfants fêtent Saint Honoré.".
+will parse the sentence "Les enfants fêtent Saint Honoré." in a few seconds.
